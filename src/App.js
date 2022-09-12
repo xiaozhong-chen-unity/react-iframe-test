@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./style.css";
+import { featureSetsByProduct } from './featureSetsByProduct';
 
 const App = () => {
   const iframeRef = useRef();
@@ -13,13 +14,39 @@ const App = () => {
     [iframeRef]
   );
 
+  const [productIndex, setProductIndex] = useState(0);
   const [engravingText, setEngravingText] = useState("");
+
+  const switchProduct = useCallback(
+    (index) => {
+      postMessageToIframe({
+        method: "switchProduct",
+        args: [index]
+      });
+      setProductIndex(index);
+    },
+    [postMessageToIframe, setProductIndex]
+  );
+
+  useEffect(() => {
+    switchProduct(0);
+  }, [switchProduct]);
+
+  const setVariant = useCallback(
+    (featureId) => {
+      postMessageToIframe({
+        method: "setVariant",
+        args: [featureId]
+      });
+    },
+    [postMessageToIframe]
+  );
 
   const engrave = useCallback(
     (text) => {
       postMessageToIframe({
-        method: 'engrave',
-        args: [text]
+        method: "engrave",
+        args: [text],
       });
     },
     [postMessageToIframe]
@@ -53,7 +80,22 @@ const App = () => {
     <div>
       <iframe ref={iframeRef} src={playerSrc} />
       <div>
-        <div>engraving</div>
+        <h3>switch product</h3>
+        <button onClick={() => switchProduct(0)}>Tank_Must_S</button>
+        <button onClick={() => switchProduct(1)}>Tank_Must_L</button>
+        <button onClick={() => switchProduct(2)}>Tank_Must_XL</button>
+      </div>
+      <div>
+        <h3>set variant</h3>
+        {featureSetsByProduct[productIndex].map((featureSet) => (<>
+          <h4>{featureSet.name}</h4>
+          <div>{featureSet.variants.map((variant) => (<>
+            <button onClick={() => setVariant(variant.id)}>{variant.name}</button>
+          </>))}</div>
+        </>))}
+      </div>
+      <div>
+        <h3>engraving</h3>
         <textarea
           rows={3}
           cols={11}
@@ -62,14 +104,14 @@ const App = () => {
         ></textarea>
       </div>
       <div>
-        <div>change camera</div>
+        <h3>change camera</h3>
         <button onClick={() => changeCamera("front")}>front</button>
         <button onClick={() => changeCamera("side")}>side</button>
         <button onClick={() => changeCamera("3/4")}>3/4</button>
         <button onClick={() => changeCamera("engraving")}>engraving</button>
       </div>
       <div>
-        <div>watch functions</div>
+        <h3>watch functions</h3>
         <button onClick={() => changeWatchFunction("setRealtime")}>
           real time
         </button>
