@@ -17,6 +17,18 @@ const App = () => {
   const [productIndex, setProductIndex] = useState(0);
   const [engravingText, setEngravingText] = useState("");
 
+  useEffect(() => {
+    const onMessage = (event) => {
+      const name = event.data[0];
+      if (name === 'productLoaded') {
+        console.log("product loaded");
+      }
+    };
+
+    window.addEventListener('message', onMessage, false);
+    return () => window.removeEventListener('message', onMessage, false);
+  }, []);
+
   const switchProduct = useCallback(
     (index) => {
       postMessageToIframe({
