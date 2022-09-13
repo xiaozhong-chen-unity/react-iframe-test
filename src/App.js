@@ -22,6 +22,8 @@ const App = () => {
       const name = event.data[0];
       if (name === 'productLoaded') {
         console.log("product loaded");
+      } else if (name === 'formaFrameInitialized') {
+        console.log('page loaded');
       }
     };
 
